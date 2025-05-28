@@ -53,13 +53,19 @@ var WildRydes = window.WildRydes || {};
      */
 
     function register(email, password, onSuccess, onFailure) {
-        var dataEmail = {
-            Name: 'email',
-            Value: email
-        };
-        var attributeEmail = new AmazonCognitoIdentity.CognitoUserAttribute(dataEmail);
+        var dataEmail = { Name: 'email', Value: email };
+        var dataBirthdate = { Name: 'birthdate', Value: '1990-01-01' };
+        var dataPhoneNumber = { Name: 'phone_number', Value: '+1234567890' };
+        var dataFormattedName = { Name: 'name', Value: 'John Doe' };
 
-        userPool.signUp(toUsername(email), password, [attributeEmail], null,
+        var attributeEmail = new AmazonCognitoIdentity.CognitoUserAttribute(dataEmail);
+        var attributeBirthdate = new AmazonCognitoIdentity.CognitoUserAttribute(dataBirthdate);
+        var attributePhoneNumber = new AmazonCognitoIdentity.CognitoUserAttribute(dataPhoneNumber);
+        var attributeFormattedName = new AmazonCognitoIdentity.CognitoUserAttribute(dataFormattedName);
+
+        var attributes = [attributeEmail, attributeBirthdate, attributePhoneNumber, attributeFormattedName];
+
+        userPool.signUp(toUsername(email), password, attributes, null,
             function signUpCallback(err, result) {
                 if (!err) {
                     onSuccess(result);
@@ -110,7 +116,7 @@ var WildRydes = window.WildRydes || {};
 
     $(function onDocReady() {
         $('#signinForm').submit(handleSignin);
-        $('#registrationForm').submit(handleRegister);
+        $('#registrationForm').submit(handleRegister);  // event listener
         $('#verifyForm').submit(handleVerify);
     });
 
@@ -148,6 +154,7 @@ var WildRydes = window.WildRydes || {};
         event.preventDefault();
 
         if (password === password2) {
+            // pass to cognito
             register(email, password, onSuccess, onFailure);
         } else {
             alert('Passwords do not match');
